@@ -40,7 +40,7 @@ class SneakerAdapter(private var sneakers: List<Sneaker>) :
             SortingOrder.DESCENDING_NAME.type -> sneakers.sortedByDescending { it.name }
             SortingOrder.ASCENDING_PRICE.type-> sneakers.sortedBy { it.retailPrice }
             SortingOrder.DESCENDING_PRICE.type-> sneakers.sortedByDescending { it.retailPrice }
-            SortingOrder.NORMAL.type-> sneakers.sortedBy { it.name?.contains(search,true) }
+            SortingOrder.QUERY_SEARCH.type-> sneakers.sortedBy { it.name?.contains(search,true) }
             else -> sneakers.sortedBy {it.id}
         }
 

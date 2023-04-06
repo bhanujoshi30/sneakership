@@ -2,11 +2,13 @@ package com.example.sneakers.ui.home
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -18,7 +20,7 @@ import com.example.sneakers.ui.adapters.SneakerAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), OnQueryTextListener {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var viewModel: HomeViewModel
@@ -36,9 +38,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun referencesUi() {
-        val toolbar = view?.findViewById<Toolbar>(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-
+        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as SearchView
+        binding.toolbar.apply {
+            title = getString(R.string.app_name_allcaps)
+        }
+        searchView.setOnQueryTextListener(this)
         binding.recyclerGridView.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -59,43 +64,7 @@ class HomeFragment : Fragment() {
         }
 
 
-        val menuHost: MenuHost = requireActivity()
-        val search = menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items
-                menuInflater.inflate(R.menu.actionbar_menu, menu)
 
-                val search = menu.findItem(R.id.action_search)
-                val searchView = search.actionView as SearchView
-                searchView.isSubmitButtonEnabled = true
-                searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        if (query != null) {
-
-                        }
-                        return true
-                    }
-
-                    override fun onQueryTextChange(query: String?): Boolean {
-                        if (query != null) {
-
-                        }
-                        return true
-                    }
-                })
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                // Handle the menu selection
-                return when (menuItem.itemId) {
-                    R.id.action_search -> {
-                        // clearCompletedTasks()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun observers() {
@@ -106,7 +75,15 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+            adapter?.sort(5, query?:"")
+        return true
+    }
 
+    override fun onQueryTextChange(newText: String?): Boolean {
+        //
+        return true
+    }
 
 
 }

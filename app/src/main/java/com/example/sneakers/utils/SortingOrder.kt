@@ -5,5 +5,6 @@ enum class SortingOrder (val type: Int) {
     DESCENDING_NAME(4),
     ASCENDING_PRICE(2),
     DESCENDING_PRICE(1),
-    NORMAL(0)
+    NORMAL(0),
+    QUERY_SEARCH(5)
 }

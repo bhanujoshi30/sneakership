@@ -4,9 +4,16 @@ package com.example.sneakers.ui
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import com.example.sneakers.R
 import com.example.sneakers.databinding.ActivityMainBinding
 import com.example.sneakers.ui.cart.CartFragment
@@ -14,19 +21,12 @@ import com.example.sneakers.ui.home.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.apply {
-            elevation = 0f
-            title = getString(R.string.app_name_allcaps)
-        }
-
         replaceFragment(HomeFragment())
         binding.bottomNavigationView.selectedItemId = R.id.home
         binding.bottomNavigationView.setOnItemSelectedListener {
@@ -46,12 +46,6 @@ class MainActivity : AppCompatActivity(){
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.d("bhanu","dsd" )
-
-        return super.onCreateOptionsMenu(menu)
-
-    }
 
 
     private fun replaceFragment(fragment: Fragment) {
@@ -60,4 +54,6 @@ class MainActivity : AppCompatActivity(){
         transaction.addToBackStack(null)
         transaction.commit()
     }
+
+
 }
