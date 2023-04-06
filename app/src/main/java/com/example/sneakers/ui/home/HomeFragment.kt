@@ -1,15 +1,19 @@
 package com.example.sneakers.ui.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import android.widget.AdapterView
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -29,7 +33,6 @@ class HomeFragment : Fragment(), OnQueryTextListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        (activity as AppCompatActivity).supportActionBar?.show()
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         observers()
@@ -39,11 +42,19 @@ class HomeFragment : Fragment(), OnQueryTextListener {
 
     private fun referencesUi() {
         val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
-        val searchView = searchItem?.actionView as SearchView
+        searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
+
         binding.toolbar.apply {
             title = getString(R.string.app_name_allcaps)
         }
-        searchView.setOnQueryTextListener(this)
+
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if(!hasFocus){
+                viewModel.getSneakers()
+            }
+        }
+
         binding.recyclerGridView.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -62,9 +73,6 @@ class HomeFragment : Fragment(), OnQueryTextListener {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
-
-
-
     }
 
     private fun observers() {
@@ -77,6 +85,9 @@ class HomeFragment : Fragment(), OnQueryTextListener {
 
     override fun onQueryTextSubmit(query: String?): Boolean {
             adapter?.sort(5, query?:"")
+        val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
+
         return true
     }
 
