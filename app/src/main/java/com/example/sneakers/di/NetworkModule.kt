@@ -21,7 +21,7 @@ object NetworkModule {
 
     @Provides
     fun getApiInterface(): ApiInterface {
-        if(apiInstance == null) {
+        if (apiInstance == null) {
             val logging = HttpLoggingInterceptor().apply { HttpLoggingInterceptor.Level.BODY }
             val okHttpClient = OkHttpClient.Builder()
             okHttpClient.apply {
@@ -38,6 +38,7 @@ object NetworkModule {
         }
         return apiInstance!!
     }
+
     @Singleton
     @Provides
     fun provideIoDispatcher() = Dispatchers.IO

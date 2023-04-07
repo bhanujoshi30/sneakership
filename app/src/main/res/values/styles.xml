@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="CustomToolbar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:textColorPrimary">@color/app_theme_color</item>
         <item name="backgroundColor">@color/white</item>
     </style>
+
     <style name="CustomFontStyle">
         <item name="android:fontFamily">@font/custom_font</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="CustomFontStyleCart">
+        <item name="android:textSize">25sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="Widget.Theme.Sneakers.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 </resources>

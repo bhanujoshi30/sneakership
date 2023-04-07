@@ -1,7 +1,7 @@
 package com.example.sneakers.di
 
+import com.example.sneakers.repositories.ISneakerRepository
 import com.example.sneakers.repositories.SneakerRepository
-import com.example.sneakers.repositories.SneakerRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,6 +13,6 @@ import javax.inject.Singleton
 abstract class SneakerRepoModule {
     @Binds
     @Singleton
-    abstract fun providesSneakerRepository(sneakerRepositoryImpl: SneakerRepositoryImpl): SneakerRepository
+    abstract fun providesSneakerRepository(sneakerRepositoryImpl: SneakerRepository): ISneakerRepository
 
 }

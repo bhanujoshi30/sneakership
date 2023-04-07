@@ -9,7 +9,7 @@ import com.example.sneakers.models.Sneaker
 
 @Database(entities = [Sneaker::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class SneakerDatabase :RoomDatabase() {
+abstract class SneakerDatabase : RoomDatabase() {
 
     abstract fun sneakerDao(): SneakerDao
 

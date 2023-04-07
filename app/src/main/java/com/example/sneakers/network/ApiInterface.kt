@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface ApiInterface {
-    @GET("icjc-x44x.json")
+    @GET("dummy_URL")
     suspend fun getSneakersList(): Response<SneakersList>
 }

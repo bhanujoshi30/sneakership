@@ -17,7 +17,8 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    @Synchronized fun getInstance(): SneakerDatabase {
+    @Synchronized
+    fun getInstance(): SneakerDatabase {
         return provideSneakerShipDatabase(MainApp.appContext)
     }
 

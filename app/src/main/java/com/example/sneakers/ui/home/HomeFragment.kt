@@ -1,46 +1,53 @@
 package com.example.sneakers.ui.home
 
 import android.content.Context
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.fragment.app.Fragment
 import android.widget.AdapterView
-import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.sneakers.R
 import com.example.sneakers.databinding.FragmentHomeBinding
+import com.example.sneakers.models.Sneaker
+import com.example.sneakers.ui.ViewModel.SharedDataViewModel
 import com.example.sneakers.ui.adapters.SneakerAdapter
+import com.example.sneakers.utils.SneakerAdapterClickType
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnQueryTextListener {
 
+    interface IHomeFragmentSneakerDetail {
+        fun sneakerClickForDetails()
+    }
+
+    private lateinit var sneakerDetailClickListener: IHomeFragmentSneakerDetail
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var viewModel: HomeViewModel
+    private lateinit var viewModel: SharedDataViewModel
     private var adapter: SneakerAdapter? = null
     private lateinit var searchView: SearchView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-        observers()
-        referencesUi()
+        viewModel = ViewModelProvider(requireActivity())[SharedDataViewModel::class.java]
+        initUi()
+        setObservers()
         return binding.root
     }
 
-    private fun referencesUi() {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        sneakerDetailClickListener = context as IHomeFragmentSneakerDetail
+    }
+
+    private fun initUi() {
         val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
         searchView = searchItem?.actionView as SearchView
         searchView.setOnQueryTextListener(this)
@@ -50,11 +57,11 @@ class HomeFragment : Fragment(), OnQueryTextListener {
         }
 
         searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if(!hasFocus){
-                viewModel.getSneakers()
+            if (!hasFocus) {
+                viewModel.sneakers.value?.let { adapter?.updateData(it) }
+                binding.sortSpinner.setSelection(0)
             }
         }
-
         binding.recyclerGridView.layoutManager = GridLayoutManager(requireContext(), 2)
 
         binding.sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -67,7 +74,7 @@ class HomeFragment : Fragment(), OnQueryTextListener {
                 } else {
                     binding.textView.text = getString(R.string.sortby_popular)
                 }
-                adapter?.sort(position, "")
+                adapter?.sort(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -75,17 +82,30 @@ class HomeFragment : Fragment(), OnQueryTextListener {
         }
     }
 
-    private fun observers() {
-        viewModel.getSneakers()
+    private fun setObservers() {
         viewModel.sneakers.observe(viewLifecycleOwner) { sneakers ->
-            adapter = SneakerAdapter(sneakers)
+            adapter =
+                SneakerAdapter(sneakers) { sneakerClicked: Sneaker, sneakerSelectType: SneakerAdapterClickType ->
+                    when (sneakerSelectType) {
+                        SneakerAdapterClickType.OPEN_DETAILS -> {
+                            viewModel.setSelectedSneakerDetail(sneakerClicked)
+                            sneakerDetailClickListener.sneakerClickForDetails()
+                        }
+                        SneakerAdapterClickType.ADD_TO_CART -> {
+                            viewModel.addSneakerToCart(sneakerClicked.id)
+                        }
+                    }
+                }
             binding.recyclerGridView.adapter = adapter
         }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-            adapter?.sort(5, query?:"")
-        val inputMethodManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        query?.let {
+            adapter?.filter(query)
+        }
+        val inputMethodManager =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(searchView.windowToken, 0)
 
         return true
