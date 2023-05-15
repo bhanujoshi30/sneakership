@@ -14,7 +14,7 @@ import com.example.sneakers.ui.home.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), HomeFragment.IHomeFragmentSneakerDetail {
+class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: SharedDataViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +24,15 @@ class MainActivity : AppCompatActivity(), HomeFragment.IHomeFragmentSneakerDetai
         setContentView(binding.root)
         replaceFragment(HomeFragment())
         initUi()
+        setObservers()
+    }
+
+    private fun setObservers() {
+        viewModel.slectedSneakerDetail.observe(this){
+            it?.let {
+                replaceFragment(SneakerDetailFragment())
+            }
+        }
     }
 
 
@@ -45,14 +54,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.IHomeFragmentSneakerDetai
     }
 
 
-    private fun replaceFragment(fragment: Fragment) {
+     fun replaceFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frame, fragment)
         transaction.commit()
-    }
-
-    override fun sneakerClickForDetails() {
-        replaceFragment(SneakerDetailFragment())
     }
 
 }

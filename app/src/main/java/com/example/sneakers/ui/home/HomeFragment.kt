@@ -23,11 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class HomeFragment : Fragment(), OnQueryTextListener {
 
-    interface IHomeFragmentSneakerDetail {
-        fun sneakerClickForDetails()
-    }
-
-    private lateinit var sneakerDetailClickListener: IHomeFragmentSneakerDetail
     private lateinit var binding: FragmentHomeBinding
     private lateinit var viewModel: SharedDataViewModel
     private var adapter: SneakerAdapter? = null
@@ -40,11 +35,6 @@ class HomeFragment : Fragment(), OnQueryTextListener {
         initUi()
         setObservers()
         return binding.root
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        sneakerDetailClickListener = context as IHomeFragmentSneakerDetail
     }
 
     private fun initUi() {
@@ -74,6 +64,7 @@ class HomeFragment : Fragment(), OnQueryTextListener {
                 } else {
                     binding.textView.text = getString(R.string.sortby_popular)
                 }
+
                 adapter?.sort(position)
             }
 
@@ -89,7 +80,6 @@ class HomeFragment : Fragment(), OnQueryTextListener {
                     when (sneakerSelectType) {
                         SneakerAdapterClickType.OPEN_DETAILS -> {
                             viewModel.setSelectedSneakerDetail(sneakerClicked)
-                            sneakerDetailClickListener.sneakerClickForDetails()
                         }
                         SneakerAdapterClickType.ADD_TO_CART -> {
                             viewModel.addSneakerToCart(sneakerClicked.id)
@@ -112,7 +102,10 @@ class HomeFragment : Fragment(), OnQueryTextListener {
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        //
+        if(newText.isNullOrEmpty()){
+            viewModel.sneakers.value?.let { adapter?.updateData(it) }
+            binding.sortSpinner.setSelection(0)
+        }
         return true
     }
 

@@ -42,7 +42,7 @@ class CartFragment : Fragment() {
             binding.cartTotalTaxes.text = java.lang.StringBuilder("Taxes and Charges: $")
                 .append(totalPrice.times(0.18).roundToLong())
             binding.grandTotal.text =
-                java.lang.StringBuilder("Total: $").append(totalPrice.times(0.18).roundToLong())
+                java.lang.StringBuilder("Total: $").append(totalPrice.times(1.18).roundToLong())
         }
 
     }

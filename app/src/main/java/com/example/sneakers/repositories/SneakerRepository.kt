@@ -12,18 +12,18 @@ import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 class SneakerRepository @Inject constructor(
-    private val mApi: ApiInterface,
+    private val mApi: RemoteRepo,
     private val dispatcher: CoroutineDispatcher,
-    private val sneakersDao: SneakerDao
+    private val sneakersLocalData: LocalRepo
 ) : ISneakerRepository {
     override suspend fun getSneakers(): Flow<List<Sneaker>> {
 
-        val sneakersFromDb = sneakersDao.getAllSneakers().firstOrNull()
+        val sneakersFromDb = sneakersLocalData.getAllSneakers().firstOrNull()
         var sneakersFromApi: SneakersList?
         return if (sneakersFromDb != null && sneakersFromDb.isNotEmpty()) {
             flowOf(sneakersFromDb).take(100)
         } else {
-            sneakersDao.addDummyData() //dummy data
+            sneakersLocalData.addDummyData() //dummy data
             /*
             * Network call commented
             * */
@@ -34,25 +34,25 @@ class SneakerRepository @Inject constructor(
 //            if (sneakersFromApi is List<*>) {
 //                saveSneakers(sneakersFromApi as List<Sneaker>)
 //            }
-            sneakersDao.getAllSneakers()
+            sneakersLocalData.getAllSneakers()
         }
     }
 
     override suspend fun saveSneakers(sneakers: List<Sneaker>) {
         for (sneaker in sneakers)
-            sneakersDao.insertSneaker(sneaker)
+            sneakersLocalData.insertSneaker(sneaker)
     }
 
     override suspend fun addSneakerToCart(sneakerId: Int) {
-        sneakersDao.addSneakerToCart(sneakerId)
+        sneakersLocalData.addSneakerToCart(sneakerId)
     }
 
     override suspend fun removeSneakerFromCart(sneakerId: Int) {
-        sneakersDao.removeSneakerFromCart(sneakerId)
+        sneakersLocalData.removeSneakerFromCart(sneakerId)
     }
 
     override suspend fun getCartAddedSneakers(): Flow<List<Sneaker>> {
-        return sneakersDao.getAllCartAddedSneakers()
+        return sneakersLocalData.getAllCartAddedSneakers()
     }
 
 }

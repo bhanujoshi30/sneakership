@@ -29,23 +29,25 @@ class SneakerDetailFragment : Fragment() {
     }
 
     private fun setSneakersDetails() {
-        binding.apply {
-            Glide.with(root.context)
-                .load(
-                    viewModel.slectedSneakerDetail.value?.media?.imageUrl
-                )
-                .centerCrop()
-                .into(sneakerImage)
-            sneakerName.text = viewModel.slectedSneakerDetail.value?.name
-            sneakerTitle.text = viewModel.slectedSneakerDetail.value?.title
-            sneakerYear.text = viewModel.slectedSneakerDetail.value?.year.toString()
-            sneakerPrice.text = buildString {
-                append("\$ ")
-                append(viewModel.slectedSneakerDetail.value?.retailPrice.toString())
+        viewModel.slectedSneakerDetail.observe(viewLifecycleOwner){
+            binding.apply {
+                Glide.with(root.context)
+                    .load(
+                        it.media?.imageUrl
+                    )
+                    .centerCrop()
+                    .into(sneakerImage)
+                sneakerName.text = it.name
+                sneakerTitle.text = it.title
+                sneakerYear.text = it.year.toString()
+                sneakerPrice.text = buildString {
+                    append("\$ ")
+                    append(it.retailPrice.toString())
+                }
             }
-            btnAddToCart.setOnClickListener {
-                viewModel.slectedSneakerDetail.value?.let { it1 -> viewModel.addSneakerToCart(it1.id) }
-            }
+        }
+        binding.btnAddToCart.setOnClickListener {
+            viewModel.slectedSneakerDetail.value?.let { it1 -> viewModel.addSneakerToCart(it1.id) }
         }
 
     }

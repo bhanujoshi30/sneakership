@@ -39,4 +39,5 @@ interface SneakerDao {
     @Query("UPDATE sneakers SET cartAdded = 0 WHERE id = :sneakerId")
     suspend fun removeSneakerFromCart(sneakerId: Int)
 
+
 }
